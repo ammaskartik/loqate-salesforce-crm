@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>48.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+       <target>lightning__RecordPage</target>
+   </targets>
+       <targetConfigs>
+      <targetConfig targets="lightning__RecordPage">
+        <property name="loqComponentTitle" type="String" default="Loqate verify Phone Number" label="Component Title" placeholder="Enter the display title" description="The title that needs to be displayed for this Phone Verification. Example: Verify and update Phone Number"/>
+         <property name="loqAPIKey" type="String" required="true" label="Loqate API key" description="Loqate API Key"/>
+         <property name="loqPhoneValidEndPoint" type="String" required="true" label="Loqate Phone Validate API Endpoint URL" description="Ensure this endpoint is registered in CSP Trusted Sites in Setup. Loqate Endpoint"/>
+         <property name="loqPhoneField" type="String" required="true" label="Phone to update" description="The Phone field to update"/>
+      </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

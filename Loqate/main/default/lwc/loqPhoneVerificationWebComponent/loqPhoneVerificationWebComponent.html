@@ -1,0 +1,23 @@
+<template>
+    <lightning-card title={loqComponentTitle}>
+        <div class="slds-p-around_medium lgc-bg slds-p-top_small slds-p-left_small">
+            <lightning-combobox
+            name="ISO2Country"
+            label="Country"
+            value={iso2_country}
+            placeholder="Select Country"
+            options={options}
+            onchange={handleISOCountryChange} ></lightning-combobox>
+            <lightning-input class="loqinp" type="search" label="Phone" onkeyup={handleSearchKeyChange} onchange={handleSearchKeyChange} placeholder="Enter phone number..."
+                value={searchKey}></lightning-input>
+        </div>
+        <template if:true={enableButton}>
+            <div class="slds-p-top_small slds-p-left_small" role="none">
+                <button class="slds-button slds-button_brand" onclick={updatePhone}>Update Phone</button>
+            </div>
+        </template>
+        <template if:true={error}>
+            <div><p class="slds-p-top_small slds-p-left_small">Loqate Exceptions:{error}</p></div>
+        </template>
+    </lightning-card> 
+</template>

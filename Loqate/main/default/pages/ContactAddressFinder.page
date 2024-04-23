@@ -1,0 +1,16 @@
+<apex:page standardController="Contact">
+    <apex:pagemessages />
+    <apex:form >
+        <apex:sectionHeader title="Contact" subtitle="{!Contact.Name}"/>
+        <apex:pageBlock title="Contact Address" mode="edit">
+            <apex:pageblockButtons >
+                <apex:commandButton value="Save" action="{!Save}"/>
+                <apex:commandButton value="Cancel" action="{!Cancel}"/>
+            </apex:pageblockButtons>
+            <apex:pageBlockSection title="Address Finder">
+                <c:AddressFinder label="Mailing" record="{!Contact}" address="ContactMailing" country="{!Contact.MailingCountry}" value="{!Contact.MailingStreet}</br>{!Contact.MailingCity}, {!Contact.MailingState} {!Contact.MailingPostalCode}</br>{!Contact.MailingCountry}" />  
+                <c:AddressFinder label="Other" record="{!Contact}" address="ContactOther" country="{!Contact.OtherCountry}" value="{!Contact.OtherStreet}</br>{!Contact.OtherCity}, {!Contact.OtherState} {!Contact.OtherPostalCode}</br>{!Contact.OtherCountry}" />                          
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Code__c</fullName>
+    <defaultValue>&quot;function(control, detail) {&quot; +  BR() + &quot;    // Add JavaScript code here&quot; +  BR() + &quot;}&quot;</defaultValue>
+    <deprecated>false</deprecated>
+    <description>Javascript that the system should execute on the event</description>
+    <externalId>false</externalId>
+    <label>Code</label>
+    <length>32000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

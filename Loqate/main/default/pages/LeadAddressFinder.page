@@ -1,0 +1,32 @@
+<apex:page standardController="Lead" lightningStylesheets="true">
+    <apex:pagemessages />
+    <apex:form >
+        <apex:sectionHeader title="Lead" subtitle="{!Lead.Name}"/>
+        <apex:pageBlock title="Lead Address (example of visualforce page)" mode="edit">
+            <apex:pageblockButtons >
+                <apex:commandButton value="Save" action="{!Save}"/>
+                <apex:commandButton value="Cancel" action="{!Cancel}"/>
+            </apex:pageblockButtons>
+            <apex:pageBlockSection title="Address Finder">
+                <c:AddressFinder label="Shipping" record="{!Lead}" address="Lead" value="</br>
+                {!Lead.Name}"/>    
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+    <script type="text/javascript">
+    
+    (function() {
+    var originCountry =  "{!JSENCODE($User.Country)}";
+    pca.on("load", function(a) {
+        console.log(a);
+        });
+    pca.on("options", function (type, id, options) {
+                debugger;
+                if (type == "capture+") {
+                    debugger;
+                    options.languagePreference = "FRE";
+                }
+           });
+     })();
+    </script>
+</apex:page>

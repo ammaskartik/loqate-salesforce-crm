@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>User_License__c</fullName>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>Your Postcode Anywhere Key suitable for Royal Mail transactions (required if Royal Mail Searches are selected). It should be in the format AA11-AA11-AA11-AA11. If you are unsure or use internal credits then use your standard key here as well.</inlineHelpText>
+    <label>Royal Mail Key (UK Only)</label>
+    <length>19</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

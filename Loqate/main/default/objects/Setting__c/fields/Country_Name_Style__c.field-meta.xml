@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Country_Name_Style__c</fullName>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>Change how country names are saved, either the full name (United States of America, Canada, United Kingdom), the ISO3 code (USA, CAN, GBR) or the ISO2 code (US, CA, GB) can be selected.</inlineHelpText>
+    <label>Country Name Style</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Full Country Name (default)</fullName>
+                <default>true</default>
+                <label>Full Country Name (default)</label>
+            </value>
+            <value>
+                <fullName>3 Character ISO Code</fullName>
+                <default>false</default>
+                <label>3 Character ISO Code</label>
+            </value>
+            <value>
+                <fullName>2 Character ISO Code</fullName>
+                <default>false</default>
+                <label>2 Character ISO Code</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

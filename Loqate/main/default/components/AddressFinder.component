@@ -1,0 +1,282 @@
+<apex:component access="global" controller="AddressExtension">
+    <apex:attribute name="Address" type="String" access="global" description="The name of the address from the Management page" assignTo="{!AddressName}" required="true" />   
+    <apex:attribute name="Record" type="SObject" access="global" description="The current record to modify" assignTo="{!SubjectRecord}" required="true" />     
+    <apex:attribute name="Label" type="String" access="global" description="A prefix for the address label"/>
+    <apex:attribute name="Country" type="String" access="global" description="The current country to search within"/>
+    <apex:attribute name="Value" type="String" access="global" description="The current address to display to the user" />
+    
+    <apex:stylesheet value="{!URLFOR($Resource.PostcodeAnywhere, 'address.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.PostcodeAnywhere, 'sensor.js')}" />
+    <apex:includeScript value="{!URLFOR($Resource.PostcodeAnywhere, 'address.js')}" />
+    
+    <script type="text/javascript">
+        if (typeof Sarissa != 'undefined' && Sarissa.originalXMLHttpRequest)
+            pca.XMLHttpRequest = Sarissa.originalXMLHttpRequest;
+    </script>
+    
+    <script type="text/javascript">
+    	var pca_fields{!Address} = {};
+    </script>
+    
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin-top:35px;">
+        <tr>
+        	<td class="labelCol">
+                <apex:outputLabel for="pca_search" value="Search"/>
+            </td>
+        	<td class="dataCol">
+                <apex:inputText id="pca_search" html-placeholder="Start typing an address" size="32" style="padding:5px;margin-bottom: 35px;" />
+            </td>
+        </tr>
+        <tr class="editAddressAuto{!Address}">
+        	<td class="labelCol">
+                <apex:outputLabel for="pca_label" value="{!Label} Address"/>
+            </td>
+        	<td class="dataCol">
+                <apex:outputText value="" id="pca_label" style="line-height: 16px;" escape="false" />
+            </td>
+        </tr>
+        <tr class="editAddressAuto{!Address}">
+        	<td class="labelCol"></td>
+        	<td class="dataCol">
+             	<apex:commandLink id="pca_edit_link" immediate="true" onclick="edit{!Address}();return false;" value="Edit" style="line-height:20px;margin-right:10px;"/>                
+            	<apex:commandLink id="pca_copy_link" immediate="true" onclick="copy{!Address}();return false;" value="Copy last search" style="display:none;line-height:20px;margin-right:10px;"/>
+            </td>
+        </tr>
+        
+        <apex:repeat var="field" value="{!SortedFields}">
+            <tr class="editAddressManual{!Address}" style="display:none;">
+                <td class="labelCol">
+            		<apex:outputLabel for="pca_edit_text" value="{!$ObjectType[SubjectRecordType].fields[SortedFields[field].Field__c].Label}" rendered="{!CONTAINS(SortedFields[field].Value__c, '\n')}"></apex:outputLabel>
+            		<apex:outputLabel for="pca_edit_field" value="{!$ObjectType[SubjectRecordType].fields[SortedFields[field].Field__c].Label}" rendered="{!NOT(CONTAINS(SortedFields[field].Value__c, '\n'))}"></apex:outputLabel>
+                </td>
+                <td class="dataCol">
+                    <apex:inputTextarea id="pca_edit_text" value="{!FieldValues[SortedFields[field].Field__c]}" rendered="{!CONTAINS(SortedFields[field].Value__c, '\n')}" cols="27" />
+                    <apex:inputText id="pca_edit_field" value="{!FieldValues[SortedFields[field].Field__c]}" rendered="{!NOT(CONTAINS(SortedFields[field].Value__c, '\n'))}" />
+                    <script>
+                        pca_fields{!Address}["{!SortedFields[field].Field__c}"] = {!CONTAINS(SortedFields[field].Value__c, '\n')} ? "{!$Component.pca_edit_text}" : "{!$Component.pca_edit_field}";
+                    </script>
+                </td>
+            </tr>
+        </apex:repeat>
+        
+        <tr class="editAddressManual{!Address}" style="display:none;">
+        	<td class="labelCol"></td>
+        	<td class="dataCol">
+    			<apex:commandLink id="pca_update_link" immediate="true" onclick="update{!Address}();return false;" value="Update" style="line-height:20px;margin-right:10px;"/> 
+            </td>
+        </tr>
+    </table>
+   
+   	<apex:actionFunction name="updatePostFields{!Address}" action="{!UpdateAddressFields}" rerender="" oncomplete="complete{!Address}()" />
+      
+    <script type="text/javascript">
+        (function() {
+            //page level variables
+            pca.salesforce = pca.salesforce || new pca.Eventable({
+                controls: [],
+                lastAddress: null,
+                lastItem: null
+            });
+            
+            var addressFieldTypes = ["Company", "Building", "Street", "Line", "City", "Province", "PostalCode", "CountryName"];
+            var addressLabelFields = [];
+            
+            //local control
+            var fields = [
+                { element: "{!$Component.pca_search}", field: "" }
+            ],
+            options = {
+                key: "{!Key}",
+                countries: { codesList: "{!CountryCodes}" },
+                setCountryByIP: {!CountryByIP} && !"{!Country}"
+            },
+            control = new pca.Address(fields, options);
+            
+            var advancedFields = {};
+            
+            <apex:repeat var="field" value="{!Fields}">
+                control.advancedFields.push("{!field.Value__c}");
+                advancedFields["{!field.Field__c}"] = { format: "{!field.Value__c}", responseIndex: control.advancedFields.length };
+            </apex:repeat>
+            
+            control.listen("load", init);
+            
+            control.listen("populate", function (address) {
+                for (var f in pca_fields{!Address}) {
+                    //do not blank out existing company name
+                    if (advancedFields[f].format == "{Company}" && !address["Field" + advancedFields[f].responseIndex])
+                        continue;
+                    
+                    pca.setValue(pca_fields{!Address}[f], address["Field" + advancedFields[f].responseIndex]);
+                }
+
+                updateAddress();
+                
+                pca.salesforce.lastAddress = address;
+                pca.salesforce.fire("populate", address);
+            });
+            
+            control.listen("select", function(item) {
+            	if (item.Next === "Retrieve") {
+                    pca.salesforce.lastItem = item;
+                	pca.salesforce.fire("retrieve", item.Id);
+                }
+            });
+            
+            
+            control.options.search.countries = '{!CountryCodes}';
+            
+            //page level events
+            pca.salesforce.controls.push(control);            
+           
+            pca.salesforce.listen("retrieve", function() {
+                pca.getElement("{!$Component.pca_copy_link}").style.display = "";
+            });
+            
+            control.listen("country", function(c) {
+                pca.salesforce.fire("country", c);
+            });
+            
+            pca.salesforce.listen("country", function(c) {
+                if (!"{!Country}" && c && control.countrylist && control.countrylist.country.iso3 != c.iso3)
+                    control.setCountry(c.iso3);
+            });
+            
+            //local functions
+            function updateLabel() {
+                var addressLabel = "";
+                var addressLines = [];
+                
+                for (var i = 0; i < addressLabelFields.length; i++) {
+                    addressLines.push(pca.getValue(pca_fields{!Address}[addressLabelFields[i].field]));
+                }
+                    
+                addressLabel = pca.tidy(addressLines.join('\n'), '\n');
+                
+                pca.setValue("{!$Component.pca_label}", addressLabel);
+            }
+            
+            function calculateAddressLabelFields() {
+            	addressLabelFields = [];
+                
+                 //returns the order for a field to appear in the address or 0
+                function addressFieldIndex(format) {
+                    for (var i = 0; i < addressFieldTypes.length; i++) {
+                        if (~format.indexOf(addressFieldTypes[i]))
+                            return i + 1;
+                    }
+                    
+                    return 0;
+                }               
+                
+                for (var t in advancedFields) {
+                    var index = addressFieldIndex(advancedFields[t].format);
+                    
+                    if (index > 0)
+                        addressLabelFields.push({ field: t, index: index });
+                }   
+                
+                addressLabelFields.sort(function(a, b) {
+                    return a.index - b.index;
+                });
+            }
+           
+            function updateAddress() {
+                hideManualEditRows();
+                showCaptureEditRows();
+                setModified();
+                showModifyingMessage();
+                updatePostFields{!Address}();
+            }
+            
+            function setModified() {
+                pca.addClass("{!$Component.pca_label}", "inlineEditModified");
+            }
+
+            function resetModified() {
+                pca.removeClass("{!$Component.pca_label}", "inlineEditModified");
+            }
+           
+            function showModifyingMessage() {
+            	pca.setValue("{!$Component.pca_label}", "Updating..."); 
+            }
+            
+            function beforeUpdate() {
+                resetModified();
+            }
+            
+            function afterUpdate() {
+                updateLabel();
+                setModified();
+            }
+            
+            function copyAddress() {
+               if (pca.salesforce.lastItem)
+                   control.select(pca.salesforce.lastItem);
+            }
+            
+            function editAddress() {
+               hideCaptureEditRows();
+               showManualEditRows();
+            }
+            
+            function showCaptureEditRows() {
+                var rows = document.getElementsByClassName("editAddressAuto{!Address}");
+                
+                for (var i = 0; i < rows.length; i++)
+                    rows[i].style.display = "";       
+            }
+            
+            function hideCaptureEditRows() {
+                var rows = document.getElementsByClassName("editAddressAuto{!Address}");
+                
+                for (var i = 0; i < rows.length; i++)
+                    rows[i].style.display = "none";
+            }
+            
+            function showManualEditRows() {
+                var rows = document.getElementsByClassName("editAddressManual{!Address}");
+                
+                for (var i = 0; i < rows.length; i++)
+                    rows[i].style.display = "";       
+            }
+            
+            function hideManualEditRows() {
+                var rows = document.getElementsByClassName("editAddressManual{!Address}");
+                
+                for (var i = 0; i < rows.length; i++)
+                    rows[i].style.display = "none";
+            }
+            
+            function setRowDisplay(fieldId, display) {
+                var element = pca.getElement(fieldId);
+                
+                if (element && element.parentNode && element.parentNode.parentNode && element.parentNode.parentNode.tagName == "TR")
+                    element.parentNode.parentNode.style.display = display;
+            }
+
+            function smashEvents() {
+                function smashEnterKey(event) {
+                    var key = window.event ? window.event.keyCode : event.which;
+                    if (key == 13) pca.smash(event);
+                }
+                
+                pca.listen(pca.getElement("{!$Component.pca_search}"), "keydown", smashEnterKey, true);
+            }
+
+            function init() {
+                smashEvents();
+                control.setCountry("{!Country}");
+                calculateAddressLabelFields();
+                updateLabel();
+            }
+            
+            //window level functions
+            window.complete{!Address} = afterUpdate;
+            window.begin{!Address} = beforeUpdate;
+            window.copy{!Address} = copyAddress;
+            window.edit{!Address} = editAddress;
+            window.update{!Address} = updateAddress;
+         })();
+    </script>
+</apex:component>

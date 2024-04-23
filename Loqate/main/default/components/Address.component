@@ -1,0 +1,44 @@
+<apex:component access="global" controller="AddressExtension">
+    <apex:attribute name="Street" type="String" access="global" description="The street field"/>
+    <apex:attribute name="City" type="String" access="global" description="The city field"/>
+    <apex:attribute name="State" type="String" access="global" description="The state field"/>
+    <apex:attribute name="Zip" type="String" access="global" description="The zip field"/>
+    <apex:attribute name="Country" type="String" access="global" description="The country field"/>
+    <apex:attribute name="Label" type="String" access="global" description="The label to append to each field"/>   
+    <apex:attribute name="License" type="String" access="global" description="The license key used for lookups. The key will be taken from settings if this is blank"/>
+    <apex:attribute name="Columns" type="Integer" access="global" description="(deprecated)"/>
+    
+    <apex:stylesheet value="{!URLFOR($Resource.PostcodeAnywhere, 'address.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.PostcodeAnywhere, 'address.js')}" />
+    
+    <apex:panelGrid columns="2" cellspacing="0" cellpadding="0" columnClasses="labelCol,dataCol" style="width:100%;" >
+        <apex:outputLabel for="pca_street">{!Label} Street</apex:outputLabel>
+        <apex:inputTextarea id="pca_street" value="{!Street}" cols="27" />
+        <apex:outputLabel for="pca_city">{!Label} City</apex:outputLabel>
+        <apex:inputText id="pca_city" value="{!City}" />
+        <apex:outputLabel for="pca_state">{!Label} State/Province</apex:outputLabel>
+        <apex:inputText id="pca_state" value="{!State}" />
+        <apex:outputLabel for="pca_postcode">{!Label} Zip/Postal Code</apex:outputLabel>
+        <apex:inputText id="pca_postcode" value="{!Zip}" />
+        <apex:outputLabel for="pca_country">{!Label} Country</apex:outputLabel>
+        <apex:inputText id="pca_country" value="{!Country}" />
+    </apex:panelGrid>
+    
+    <script type="text/javascript">
+        (function() {
+            var fields = [
+                { element: "{!$Component.pca_street}", field: "{Line1}" },
+                { element: "{!$Component.pca_city}", field: "{City}", mode: pca.fieldMode.POPULATE },
+                { element: "{!$Component.pca_state}", field: "{Province}", mode: pca.fieldMode.POPULATE },
+                { element: "{!$Component.pca_postcode}", field: "{PostalCode}" },
+                { element: "{!$Component.pca_country}", field: "{CountryName}", mode: pca.fieldMode.COUNTRY | pca.fieldMode.POPULATE }
+            ],
+            options = {
+                key: "{!License}" || "{!Key}",
+                countries: { codesList: "{!CountryCodes}" },
+                setCountryByIP: {!CountryByIP}
+            },
+            control = new pca.Address(fields, options);
+         })();
+    </script>
+</apex:component>

@@ -1,0 +1,112 @@
+<apex:page docType="html-5.0" standardController="PostcodeAnywhereFields__c" extensions="EditAddressFieldExtension" tabStyle="Management__tab" lightningStylesheets="true">
+    <apex:stylesheet value="{!URLFOR($Resource.PostcodeAnywhere, 'address.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.PostcodeAnywhere, 'address.js')}" />
+    
+    <apex:sectionHeader title="Postcode Anywhere" subtitle="Edit Field" />
+    
+    <apex:pagemessages />
+    
+    <apex:form id="Edit">
+        <apex:pageblock id="Field" title="Field" mode="edit">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!SaveEdit}" value="Save" />
+                <apex:commandButton action="{!Abort}" value="Cancel" immediate="true" />
+            </apex:pageBlockButtons>
+            <apex:pageblockSection id="Details" title="Details">
+                <apex:inputField id="fieldName" label="{!ObjectName} Field" value="{!PostcodeAnywhereFields__c.Field__c}" required="false" />                
+                <apex:inputField id="fieldValue" label="Address Elements" value="{!PostcodeAnywhereFields__c.Value__c}" style="width: 300px;" />
+                <apex:inputHidden id="addressName" value="{!PostcodeAnywhereFields__c.Address__c}" />
+            </apex:pageblockSection>
+        </apex:pageblock>
+    </apex:form>
+    
+    <script type="text/javascript">
+        var addressNameField = pca.getElement("addressName");
+        var addressNameParam = "{!$CurrentPage.parameters.address}";
+    
+        if (pca.getValue(addressNameField) == "")
+            pca.setValue(addressNameField, addressNameParam);
+    
+        var allFields = {!AllFields};
+        var fields = [];
+        var fieldNameField = pca.getElement("fieldName");
+    
+        fieldNameField.autocomplete = "off";
+        allFields.sort();
+    
+        for (var i = 0; i < allFields.length; i++)
+            fields.push({ name: allFields[i] });
+    
+        var autocomplete = new pca.AutoComplete(fieldNameField);
+    
+        autocomplete.add(fields, "{name}", function(field) {
+            pca.setValue(fieldNameField, field.name);
+            autocomplete.hide();
+        });
+    
+        autocomplete.list.listen("show", function() {
+            autocomplete.list.filter(pca.getValue(fieldNameField));
+        });
+        autocomplete.list.listen("filter", autocomplete.list.first);
+    
+        var commonValues = [
+            { value: "{City}" },
+            { value: "{Province}" },
+            { value: "{PostalCode}" },
+            { value: "{CountryName}" },
+            { value: "{Line1}{\\n{Line2}}{\\n{Line3}}{\\n{Line4}}{\\n{Line5}}" },                 
+            { value: "{Line1}" },
+            { value: "{Line2}" },
+            { value: "{Line3}" },
+            { value: "{Line4}" },
+            { value: "{Line5}" },   
+            { value: "{Id}" },
+            { value: "{DomesticId}" },
+            { value: "{Language}" },
+            { value: "{Department}" },
+            { value: "{Company}" },
+            { value: "{SubBuilding}" },
+            { value: "{BuildingNumber}" },
+            { value: "{BuildingName}" },
+            { value: "{SecondaryStreet}" },
+            { value: "{Street}" },
+            { value: "{Block}" },
+            { value: "{Neighbourhood}" },
+            { value: "{District}" },
+            { value: "{AdminAreaName}" },
+            { value: "{AdminAreaCode}" },
+            { value: "{ProvinceName}" },
+            { value: "{ProvinceCode}" },
+            { value: "{CountryIso2}" },
+            { value: "{CountryIso3}" },
+            { value: "{CountryIsoNumber}" },
+            { value: "{Latitude}" },
+            { value: "{Longitude}" }
+        ];
+    
+        var fieldValueField = pca.getElement("fieldValue");
+        var fieldAutocomplete = new pca.AutoComplete(fieldValueField, { skipFilter: true });
+
+        fieldValueField.autocomplete = "off";
+    
+        fieldAutocomplete.add(commonValues, "{value}", function(field) {
+            var currentValue = pca.getValue(fieldValueField);
+            fieldValueField.value = currentValue.replace(/(?:^|\{|\w)[^|{|\s]*$/g, "") + field.value;
+            fieldAutocomplete.hide();
+        });
+        
+        pca.listen(fieldValueField, "keyup", function(event) {
+            event = event || window.event;
+            var key = event.which || event.keyCode;
+            
+            if (key == 0 || key == 8 || key > 45) {
+                var currentValue = pca.getValue(fieldValueField);
+                fieldAutocomplete.filter((/(?:^|\{|\w)[^|{|\s]*$/g.exec(currentValue) || []).toString());
+            }
+            
+            if (key == 32) fieldAutocomplete.showAll();
+        });
+  
+        fieldAutocomplete.list.listen("filter", fieldAutocomplete.list.first);
+    </script>
+</apex:page>

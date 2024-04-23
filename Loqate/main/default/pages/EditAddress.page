@@ -1,0 +1,75 @@
+<apex:page standardController="PostcodeAnywhereAddresses__c" extensions="EditAddressExtension" tabStyle="Management__tab" lightningStylesheets="true">
+    <apex:stylesheet value="{!URLFOR($Resource.PostcodeAnywhere, 'address.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.PostcodeAnywhere, 'address.js')}" />
+    
+    <apex:sectionHeader title="Postcode Anywhere" subtitle="Edit Address" />
+   
+    <apex:pagemessages />
+   
+    <apex:form id="Edit">
+          <apex:pageblock id="AddressDetails" title="Address" mode="detail" rendered="{!NOT(IsEdit)}">
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!Abort}" value="Back" immediate="true" />
+                </apex:pageBlockButtons>
+                <apex:pageblockSection id="Details" title="Details">
+                    <apex:outputField value="{!PostcodeAnywhereAddresses__c.Name}" />
+                    <apex:outputField value="{!PostcodeAnywhereAddresses__c.Object__c}" />
+                </apex:pageblockSection>
+        </apex:pageblock>      
+        
+        <apex:pageblock id="AddressEdit" title="Address" mode="edit" rendered="{!IsEdit}">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!SaveEdit}" value="Save" />
+                <apex:commandButton action="{!Abort}" value="Cancel" immediate="true" />
+            </apex:pageBlockButtons>
+            <apex:pageblockSection id="Details" title="Details">
+                <apex:inputField value="{!PostcodeAnywhereAddresses__c.Name}" />
+                <apex:inputField id="objectName" value="{!PostcodeAnywhereAddresses__c.Object__c}" />
+            </apex:pageblockSection>
+        </apex:pageblock>
+        
+        <apex:pageblock id="Fields" title="Fields" rendered="{!NOT(IsEdit)}">
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!NewField}" value="New Field" />
+            </apex:pageBlockButtons>
+            <apex:pageBlockTable value="{!Fields}" var="field">
+                <apex:column headerValue="Action" width="40">
+                    <apex:commandLink value="Del" action="{!DeleteField}">
+                        <apex:param name="field" value="{!field.Id}" assignTo="{!fieldToDelete}"></apex:param>
+                    </apex:commandLink>
+                </apex:column>
+                <apex:column headerValue="Field">
+                    <apex:outputLink value="{!$Page.EditAddressField}?id={!field.Id}">{!field.Field__c}</apex:outputLink>
+                </apex:column>
+                <apex:column headerValue="Value" value="{!field.Value__c}" />
+            </apex:pageBlockTable>
+        </apex:pageBlock>
+    </apex:form>
+    
+    <script type="text/javascript">
+        var sObjectNames = {!AllSObjects};
+        var sObjects = [];
+        var sObjectField = pca.getElement("objectName");
+    
+        if (sObjectField) {
+            sObjectField.autocomplete = "off";
+        
+            sObjectNames.sort();
+        
+            for (var i = 0; i < sObjectNames.length; i++)
+                sObjects.push({ name: sObjectNames[i] });
+        
+            var autocomplete = new pca.AutoComplete(sObjectField);
+        
+            autocomplete.add(sObjects, "{name}", function(sObject) {
+                pca.setValue(sObjectField, sObject.name);
+                autocomplete.hide();
+            });
+        
+            autocomplete.list.listen("show", function() {
+                autocomplete.list.filter(pca.getValue(sObjectField));
+            });
+            autocomplete.list.listen("filter", autocomplete.list.first);
+        }
+    </script>
+</apex:page>

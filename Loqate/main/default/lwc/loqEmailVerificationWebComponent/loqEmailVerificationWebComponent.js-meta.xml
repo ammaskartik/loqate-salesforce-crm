@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>47.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+       <target>lightning__RecordPage</target>
+   </targets>
+       <targetConfigs>
+      <targetConfig targets="lightning__RecordPage">
+        <property name="loqComponentTitle" type="String" default="Loqate verify address" label="Component Title" placeholder="Enter the display title" description="The title that needs to be displayed for this Email Address Verification. Example: Verify and update Corporate Email Address"/>
+         <property name="loqAPIKey" type="String" required="true" label="Loqate API key" description="Loqate API Key"/>
+         <property name="loqEmailValidEndPoint" type="String" required="true" label="Loqate Email Validate API Endpoint URL" description="Ensure this endpoint is registered in CSP Trusted Sites in Setup. Loqate Endpoint"/>
+         <property name="loqTimeOut" type="Integer" default="15000" label="API Timeout" description="The time (in milliseconds) you want to give for the valiation attempt to be executed within. Value must be between 1 and 15000"/>
+         <property name="loqEmailField" type="String" required="true" label="Email to update" description="The Email field to update"/>
+      </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

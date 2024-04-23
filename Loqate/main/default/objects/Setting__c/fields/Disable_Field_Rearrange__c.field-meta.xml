@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disable_Field_Rearrange__c</fullName>
+    <defaultValue>false</defaultValue>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>When ticked the app will not rearrange standard address fields. Custom address fields will not be rearranged regardless of this setting, and should be arranged manually for address lookup.</inlineHelpText>
+    <label>Disable Standard Field Rearrange</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

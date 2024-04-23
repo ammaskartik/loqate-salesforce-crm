@@ -1,0 +1,16 @@
+<template>
+    <lightning-card title={loqComponentTitle}>
+    <div class="slds-p-around_medium lgc-bg slds-p-top_small slds-p-left_small">
+        <lightning-input class="loqinp" type="search" label="E-mail address" onkeyup={handleSearchKeyChange} onchange={handleSearchKeyChange} placeholder="Enter email..."
+            value={searchKey}></lightning-input>
+    </div>
+    <template if:true={enableButton}>
+        <div class="slds-p-top_small slds-p-left_small" role="none">
+            <button class="slds-button slds-button_brand" onclick={updateEmail}>Update Email Address</button>
+        </div>
+    </template>
+    <template if:true={error}>
+        <div><p class="slds-p-top_small slds-p-left_small">Loqate Exceptions:{error}</p></div>
+    </template>
+</lightning-card>
+</template>

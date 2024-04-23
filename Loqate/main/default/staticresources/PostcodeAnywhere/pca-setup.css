@@ -1,0 +1,19 @@
+.pca-splash {
+    background-color:#005bb6;
+    background-position: center, center;
+    background-repeat: no-repeat;
+    position:fixed; 
+    top:0px; 
+    left:0px; 
+    height:100%; 
+    width:100%; 
+    opacity: 0;
+    z-index: 9999999;
+}
+
+.setup-panel {
+    padding: 10px;
+}
+.setup-panel-instructions {
+    max-width: 500px;
+}

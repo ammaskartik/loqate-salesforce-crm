@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disable_Other_Country_Option__c</fullName>
+    <defaultValue>false</defaultValue>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>When ticked the app will not add an &apos;Other&apos; option to the country list. The &apos;Other&apos; option is used to enter a free text country name when the desired country does not appear in the list.</inlineHelpText>
+    <label>Disable Other Country Option</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

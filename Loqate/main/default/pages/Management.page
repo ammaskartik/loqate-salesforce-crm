@@ -1,0 +1,897 @@
+<apex:page showHeader="true" controller="SetupController" tabStyle="Management__tab" lightningStylesheets="true">
+    <apex:stylesheet value="{!URLFOR($Resource.PostcodeAnywhere, 'pca-setup.css')}" />
+    <apex:stylesheet value="{!URLFOR($Resource.PostcodeAnywhere, 'address.css')}" />
+    <apex:includeScript value="{!URLFOR($Resource.PostcodeAnywhere, 'address.js')}" />
+    <apex:includeScript value="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"/>    
+    
+    
+    <apex:sectionHeader title="Loqate" subtitle="Account Management and Setup" />
+    
+    <apex:pageMessages id="pageErrors"></apex:pageMessages>
+       
+    
+    <apex:form id="Setup" styleClass="pca-setup-form">
+        
+        <script type="text/javascript">
+            var accountCloned = false;
+            var contactCloned = false;
+            var leadCloned = false;
+        </script>
+        
+        <apex:pageBlock id="SetupPage" title="Setup" >
+            <apex:pageBlockButtons >
+                <apex:commandButton action="{!Save}" value="Save" />
+            </apex:pageBlockButtons>
+            
+            <apex:pageblock id="Account" title="Account" mode="edit">
+                <apex:pageblockSection id="API" title="Credentials">
+                    <apex:inputField value="{!Settings.Key__c}" id="key" onchange="account.getBalance()" />
+                    <apex:outputLink target="_blank" value="https://account.loqate.com/">Manage your account</apex:outputLink>
+                </apex:pageblockSection>
+                <apex:pageblockSection id="Credit" title="Balance">
+                    <apex:pageBlockSectionItem helpText="This shows the current amount of credit on your account. Credit is required for each address that is captured.">
+                        <apex:outputLabel id="balanceLabel" for="creditBalance" value="Credit" ></apex:outputLabel>
+                        <apex:outputText id="creditBalance" value="Unknown"></apex:outputText>
+                    </apex:pageBlockSectionItem>
+                    <apex:outputLink target="_blank" value="https://account.loqate.com/">Top up credit</apex:outputLink>
+                </apex:pageblockSection>            
+            </apex:pageblock>
+            
+            <apex:pageBlock id="SetupOptions" title="Loqate Setup">
+                
+                <apex:outputPanel id="SetupInstructions" layout="block" styleClass="setup-panel">
+                    <!--
+                    <p>There are two ways to implement the PCA Predict validation app in Salesforce, click the setup option for your preferred method below. Both options work with Salesforce Classic and Lightning Experience. </p>
+                     -->
+                    <apex:panelGrid columns="1"> 
+                        <apex:outputPanel layout="block" styleClass="setup-panel setup-panel-instructions setup-panel-validate-on-request">
+                            <apex:panelGrid columns="1">
+                                <!-- <h1>A) Validate on Request</h1> -->
+                                <ul>
+                                    <li>Address data can be validated</li>
+                                    <li>A new ‘Validate’ button will be added to all screens for Leads, Contacts and Accounts</li>
+                                    <li>Address data will be validated if the user selects the ‘Validate’ button at the top of the page - this will open a popup window where a valid address can be searched</li>
+                                    <li>You can choose which fields to validate and on which pages</li>
+                                </ul>
+                                <!-- 
+                                <p>Notes to consider:</p> 
+                                <ul>
+                                    <li>Phone and email address validation may be added in future updates</li>
+                                </ul>
+                                -->
+                            </apex:panelGrid>
+                        </apex:outputPanel>
+                        <!-- 
+                        <apex:outputPanel layout="block" styleClass="setup-panel setup-panel-instructions setup-panel-validate-auto">
+                            <apex:panelGrid columns="1">                            
+                                <h1>B) Auto-Validate in Real Time</h1>
+                                <ul>
+                                    <li>Address, mobile/cell phone numbers and email address data can be validated</li>
+                                    <li>Data will be validated as the user types in the fields</li>
+                                    <li>Validation will complete in real-time on the ‘Edit’ and ‘New’ screens for Leads, Contacts, and Accounts</li>
+                                    <li>You can choose which fields to validate and on which pages</li>
+                                </ul>
+                                <p>Notes to consider:</p>
+                                <ul>
+                                    <li>We will clone your Lead, Contact, and Account pages as VisualForce pages</li>
+                                    <li>Each edit/new page (for Leads, Contacts and Accounts) will be the same for all user profiles</li>
+                                    <li>Inline field editing will be disabled when viewing Leads, Contacts, and Accounts</li>
+                                    <li>Accessibility Mode should be disabled across your Org</li>
+                                    <li>You should not use State or Country picklists (these will not be needed)</li>
+                                </ul>
+                            </apex:panelGrid>
+                        </apex:outputPanel>
+                         -->
+                        <apex:panelGrid columns="1">
+                            <apex:commandButton id="ManualSetupBtn" onclick="showManualSetup(); return false;" value="Set up validation"/>
+                        </apex:panelGrid>
+                        <!--
+                        <apex:panelGrid columns="1">
+                            <apex:commandButton id="QuickSetupBtn" onclick="showQuickSetup(); return false;" value="Set up Auto-validation"/>
+                        </apex:panelGrid>
+                          -->
+                    </apex:panelGrid>
+                    
+                </apex:outputPanel>
+                
+                <apex:outputPanel id="ManualSetup" layout="block" styleClass="setup-panel setup-panel-manual" style="display:none;">
+                    <apex:panelGrid columns="1">
+                        <hr/>
+                        <br/>
+                        <h1>Set up ‘on request’ validation with PCA Predict</h1>
+                        <p>Complete the setup with the configuration options below.</p>
+                        <!-- <p>To customize the countries and order in which they appear, use the controls to move countries from the list on the left to the list on the right. If the list of the right is empty, all countries will be shown.</p> -->
+                        
+                        
+                        
+                                                   
+                    </apex:panelGrid>
+                
+                </apex:outputPanel>
+                
+                <!-- DELETE WHEN GOING LIVE --> <!--
+                <apex:outputPanel id="QuickSetup" layout="block" styleClass="setup-panel setup-panel-quick" style="display:none;">
+                    <apex:panelGrid columns="1">
+                        <hr/>
+                        <p>&nbsp;</p>
+                        <h1>Set up Auto-validation with PCA Predict</h1>
+                        <p>This is a private release to selected customers while we finish off development. Please use the existing method "Validate on Request".</p>                        
+                    </apex:panelGrid>
+                    
+                </apex:outputPanel>
+                --><!-- DELETE WHEN GOING LIVE -->
+                
+                <!-- UNCOMMENT WHEN GOING LIVE -->
+                <apex:outputPanel id="QuickSetup" layout="block" styleClass="setup-panel setup-panel-quick" style="display:none;">
+                    <apex:panelGrid columns="1">
+                        <hr/>
+                        <p>&nbsp;</p>
+                        <h1>Set up Auto-validation with PCA Predict</h1>
+                        <p>Complete the setup with the configuration options below.</p>
+                        <apex:outputPanel layout="block" styleClass="addMetaAPIConnection" style="display:none;">
+                            <p>First enable the PCA Predict app to make API calls to your Salesforce org: <br/>
+                                Please go to 'Setup->Security->Remote site settings' and add an entry for 'https://{!Host}/services/Soap/m/31.0'<br/>&nbsp;</p>
+                            
+
+                            <!-- <apex:commandButton id="AddRemoteSiteSettings" styleClass="add-remote-site-settings-btn" onclick="addRemoteSiteSettings(); return false;" value="Enable PCA Predict" /> -->
+                            <p>If you are upgrading from a version of our app (prior to 9.8), please disable API restrictions for the app <br/>
+                            by going to the list of installed packages, click on &apos;Postcode Anywhere&apos; and click &apos;Disable Restrictions&apos; for this app.</p>
+                        </apex:outputPanel>
+                        
+                        <br/>
+                        
+                        <apex:panelGrid id="quickSetupContainer" styleClass="quickSetupContainer" columns="1" >
+                            <apex:panelGrid columns="1">
+                                <h1>Service Preferences</h1>
+                                <p>Select the validation services you’d like to use:</p>
+                                <apex:panelGrid columns="2">
+                                    <apex:inputField value="{!Settings.Address_Validation__c}" id="AddressValidation" />
+                                    <apex:outputLabel style="line-height: 22px;" for="AddressValidation">Address validation</apex:outputLabel>
+                                </apex:panelGrid>
+                                <apex:panelGrid columns="2">
+                                    <apex:inputField value="{!Settings.Email_Validation__c}" id="EmailValidation" />
+                                    <apex:outputLabel style="line-height: 22px;" for="EmailValidation">Email address validation</apex:outputLabel>
+                                </apex:panelGrid>
+                                <apex:panelGrid columns="2">
+                                    <apex:inputField value="{!Settings.Mobile_Validation__c}" id="MobileValidation" />
+                                    <apex:outputLabel style="line-height: 22px;" for="MobileValidation">Mobile/cell validation</apex:outputLabel>
+                                </apex:panelGrid>
+                            </apex:panelGrid>
+                            
+                            <br/>
+                            
+                            <apex:panelGrid columns="1">  
+                                <h1>Select which view to use for your pages:</h1>
+                                <p>
+                                    For each page, choose the layout to use for the Edit/New page. <br/>
+                                    Once you have selected the layout, ‘Clone’ it and choose ‘LIVE’ to publish.
+                                </p>
+                                <p>If you need to revert back, click ‘Reset’ to delete the cloned layout and start again.</p>
+                                <br/>
+                                <apex:panelGrid columns="7" id="quickSetupControls">
+                                    <apex:panelGrid columns="1">
+                                        <h1>Page</h1>
+                                        <apex:outputText style="line-height: 24px;" value="Account" />
+                                        <apex:outputText style="line-height: 24px;" value="Contact" />
+                                        <apex:outputText style="line-height: 24px;" value="Lead" />
+                                    </apex:panelGrid>
+                                    
+                                    <apex:panelGrid id="layoutOptions" columns="1"> 
+                                        <h1>Layout</h1>
+                                        <apex:selectList id="accountLayoutList" styleClass="pca-control pca-layout-control" multiselect="false" size="1" value="{!selectedAccountLayout}" style="height:24px;">
+                                            <apex:selectOptions value="{!accountLayouts}" />
+                                        </apex:selectList>
+                                        <apex:selectList id="contactLayoutList" styleClass="pca-control pca-layout-control" multiselect="false" size="1" value="{!selectedContactLayout}" style="height:24px;">
+                                            <apex:selectOptions value="{!contactLayouts}" />
+                                        </apex:selectList>
+                                        <apex:selectList id="leadLayoutList" styleClass="pca-control pca-layout-control" multiselect="false" size="1" value="{!selectedLeadLayout}" style="height:24px;">
+                                            <apex:selectOptions value="{!leadLayouts}" />
+                                        </apex:selectList>
+                                    </apex:panelGrid>
+                                    
+                                    <apex:panelGrid columns="1">
+                                        <h1>&nbsp;</h1>
+                                        <apex:commandButton id="accountSetupBtn" styleClass="pca-control pca-clone-control pca-account-clone-control" value="Clone" onclick="pcaDisableControls(); setLoadingImages(true, false, false); DoQuickSetup('Account'); return false;" />
+                                        <apex:commandButton id="contactSetupBtn" styleClass="pca-control pca-clone-control pca-contact-clone-control" value="Clone" onclick="pcaDisableControls(); setLoadingImages(false, true, false); DoQuickSetup('Contact'); return false;" /> 
+                                        <apex:commandButton id="leadSetupBtn" styleClass="pca-control pca-clone-control pca-lead-clone-control" value="Clone" onclick="pcaDisableControls(); setLoadingImages(false, false, true); DoQuickSetup('Lead'); return false;" />         
+                                    </apex:panelGrid>   
+                                    
+                                    <apex:panelGrid columns="1">
+                                        <h1>&nbsp;</h1>
+                                        <apex:image styleClass="accountClonedImage" url="{!URLFOR($Resource.PostcodeAnywhere, 'loading.gif')}" height="22" width="22" alt="" />
+                                        <apex:image styleClass="contactClonedImage" url="{!URLFOR($Resource.PostcodeAnywhere, 'loading.gif')}" height="22" width="22" alt="" />
+                                        <apex:image styleClass="leadClonedImage" url="{!URLFOR($Resource.PostcodeAnywhere, 'loading.gif')}" height="22" width="22" alt="" />
+                                    </apex:panelGrid> 
+                                    
+                                    <apex:panelGrid columns="1">
+                                        <h1>&nbsp;</h1>
+                                        <apex:commandButton id="accountLiveBtn" styleClass="pca-control pca-live-control pca-account-live-control" value="LIVE" onclick="pcaDisableControls(); setLoadingImages(true, false, false); MakeLive('Account'); return false;" />
+                                        <apex:commandButton id="contactLiveBtn" styleClass="pca-control pca-live-control pca-contact-live-control" value="LIVE" onclick="pcaDisableControls(); setLoadingImages(false, true, false); MakeLive('Contact'); return false;" />
+                                        <apex:commandButton id="leadLiveBtn" styleClass="pca-control pca-live-control pca-lead-live-control" value="LIVE" onclick="pcaDisableControls(); setLoadingImages(false, false, true); MakeLive('Lead'); return false;" />        
+                                    </apex:panelGrid>   
+                                    
+                                    <apex:panelGrid columns="1">
+                                        <h1>&nbsp;</h1>
+                                        <apex:image styleClass="accountOverriddenImage" url="{!URLFOR($Resource.PostcodeAnywhere, 'loading.gif')}" height="22" width="22" alt="" />
+                                        <apex:image styleClass="contactOverriddenImage" url="{!URLFOR($Resource.PostcodeAnywhere, 'loading.gif')}" height="22" width="22" alt="" />
+                                        <apex:image styleClass="leadOverriddenImage" url="{!URLFOR($Resource.PostcodeAnywhere, 'loading.gif')}" height="22" width="22" alt="" />
+                                        
+                                    </apex:panelGrid>
+                                    
+                                    <apex:panelGrid columns="1">
+                                        <h1>&nbsp;</h1>
+                                        <apex:commandButton id="accountResetBtn" styleClass="pca-control pca-reset-control pca-account-reset-control" value="Reset" onclick="pcaDisableControls(); setLoadingImages(true, false, false); Reset('Account'); return false;" />
+                                        <apex:commandButton id="contactResetBtn" styleClass="pca-control pca-reset-control pca-contact-reset-control" value="Reset" onclick="pcaDisableControls(); setLoadingImages(false, true, false); Reset('Contact'); return false;" />
+                                        <apex:commandButton id="leadResetBtn" styleClass="pca-control pca-reset-control pca-lead-reset-control" value="Reset" onclick="pcaDisableControls(); setLoadingImages(false, false, true); Reset('Lead'); return false;" />  
+                                    </apex:panelGrid>
+                                    
+                                </apex:panelGrid>
+                                
+                                <apex:panelGrid columns="1">
+                                    <apex:outputText rendered="{!quickSetupResult==''}"><p>&nbsp;</p></apex:outputText>
+                                    <apex:actionStatus startText="Working. Please wait...(this may take a minute or two)" id="setupStatus">
+                                        <apex:facet name="stop">{!quickSetupResult}</apex:facet>
+                                    </apex:actionStatus>
+                                </apex:panelGrid>
+                                 
+                            </apex:panelGrid> 
+                        </apex:panelGrid>
+                        
+                    </apex:panelGrid>
+                    
+                </apex:outputPanel>
+                <!-- UNCOMMENT WHEN GOING LIVE -->  
+                
+                <apex:outputPanel id="CountrySelector" layout="block" styleClass="setup-panel setup-panel-country" style="display:none;">
+                    <apex:panelGrid columns="1">
+                        <apex:panelGrid columns="4">
+                            <apex:panelGrid columns="1">
+                                <apex:outputLabel value="Hidden" for="hiddenCountryList"/>
+                                <select id="hiddenCountryList" size="10" multiple="multiple" style="width:250px;position:relative;height:172px;" />
+                            </apex:panelGrid>
+                            <apex:panelGroup >
+                                <apex:panelGrid columns="1">
+                                    <br/><br/><br/>
+                                    <apex:outputText value="Add"/>
+                                    <apex:image value="/s.gif" styleClass="rightArrowIcon" style="cursor:pointer" onclick="countrylist.addOptions()"/> 
+                                    <apex:image value="/s.gif" styleClass="leftArrowIcon" style="cursor:pointer" onclick="countrylist.removeOptions()"/> 
+                                    <apex:outputText value="Remove"/>
+                                </apex:panelGrid>
+                            </apex:panelGroup>
+                            <apex:panelGrid columns="1">
+                                <apex:outputLabel value="Displayed" for="displayCountryList"/>
+                                <select id="displayCountryList" size="10" multiple="multiple" style="width:250px;position:relative;height:172px" />
+                            </apex:panelGrid>
+                            <apex:panelGroup >
+                                <apex:panelGrid columns="1">
+                                    <br/>
+                                    <apex:outputText value="Top"/>
+                                    <apex:image value="/s.gif" styleClass="upArrowIcon" style="cursor:pointer" onclick="countrylist.moveTop()"/> 
+                                    <apex:outputText value="Up"/>
+                                    <apex:image value="/s.gif" styleClass="upArrowIcon" style="cursor:pointer" onclick="countrylist.moveUp()"/> 
+                                    <apex:image value="/s.gif" styleClass="downArrowIcon" style="cursor:pointer" onclick="countrylist.moveDown()"/> 
+                                    <apex:outputText value="Down"/>
+                                    <apex:image value="/s.gif" styleClass="downArrowIcon" style="cursor:pointer" onclick="countrylist.moveBottom()"/> 
+                                    <apex:outputText value="Bottom"/>
+                                </apex:panelGrid>
+                            </apex:panelGroup>
+                            <apex:panelGrid columns="2" rendered="false">
+                                <apex:inputField value="{!Settings.CountryByIP__c}" id="CountryByIP" />
+                                <apex:outputLabel style="line-height: 22px;" for="CountryByIP">Begin search in local country? (based on IP)</apex:outputLabel>                                
+                            </apex:panelGrid>
+                            <apex:inputHidden id="countryCodes" value="{!CountryCodes}"/>
+                        </apex:panelGrid>
+                        
+                    </apex:panelGrid>
+                </apex:outputPanel>              
+
+                <apex:outputPanel id="AddressForms" layout="block" styleClass="setup-panel setup-panel-address-forms" style="display:none;">
+                    <apex:panelGrid columns="1" style="width:100%;">
+                        <p>Create address fieldsets that you want to ‘validate’:</p>
+                        <apex:pageBlockTable value="{!Addresses}" var="address">
+                            <apex:column headerValue="Action" width="40">
+                                <apex:commandLink value="Del" action="{!DeleteAddress}">
+                                    <apex:param name="id" value="{!address.Id}" assignTo="{!addressToDelete}"></apex:param>
+                                </apex:commandLink>
+                            </apex:column>
+                            <apex:column headerValue="Address Name">
+                                <apex:outputLink value="{!$Page.EditAddress}?id={!address.Id}">{!address.Name}</apex:outputLink>
+                            </apex:column>
+                        </apex:pageBlockTable>
+                        <apex:commandButton action="{!NewAddress}" value="New Address Form" />
+                    </apex:panelGrid>
+                </apex:outputPanel>
+            </apex:pageBlock>
+            
+                
+            <apex:panelGrid columns="1">
+                
+                <apex:actionFunction action="{!doQuickSetup}" name="DoQuickSetup" reRender="setupStatus" status="setupStatus" oncomplete="SetPermissions();">
+                    <apex:param assignTo="{!objectType}" value="" name="param1" />
+                </apex:actionFunction>
+                <apex:actionFunction action="{!setPermissions}" name="SetPermissions" reRender="setupStatus" status="setupStatus" oncomplete="update({!accountCloned},{!contactCloned},{!leadCloned});" />
+                
+                <apex:actionFunction action="{!overrideButton}" name="MakeLive" reRender="setupStatus" status="setupStatus" oncomplete="update({!accountCloned},{!contactCloned},{!leadCloned});">
+                    <apex:param assignTo="{!objectType}" value="" name="param1" />
+                </apex:actionFunction>
+                <apex:actionFunction action="{!updateStatuses}" name="UpdateStatuses" reRender="" oncomplete="update({!accountCloned},{!contactCloned},{!leadCloned}); " />
+                <apex:actionFunction action="{!resetButton}" name="Reset" reRender="setupStatus" status="setupStatus" oncomplete="update({!accountCloned},{!contactCloned},{!leadCloned});">
+                    <apex:param assignTo="{!objectType}" value="" name="param1" />
+                </apex:actionFunction>
+                <apex:actionFunction action="{!init}" name="Init" reRender="layoutOptions" oncomplete="update({!accountCloned},{!contactCloned},{!leadCloned});"/>
+                <apex:actionFunction action="{!setShowSplashOff}" name="stopSplash" />
+                <apex:actionFunction action="{!checkMetadataAPIConnection}" name="CheckMetadataAPIConnection" oncomplete="startup({!metadataAPIConnectionOkay});" />
+                <apex:actionFunction action="{!refreshLayouts}" name="RefreshLayouts" reRender="layoutOptions" oncomplete="" />
+            </apex:panelGrid>
+            
+            <apex:actionFunction name="saveSettings" action="{!Save}" />
+        </apex:pageBlock>
+        
+            
+    </apex:form>
+    
+     <!-- <apex:outputPanel id="PcaSplash" layout="block" style="background-image:url('{!URLFOR($Resource.PostcodeAnywhere, 'pca-predict-logo.png')}');" styleClass="pca-splash"></apex:outputPanel> -->
+    
+    <script type="text/javascript">
+        
+        var j$ = jQuery.noConflict();
+        
+        var showAnimating = false;
+        var showSplash = false; // {!Settings.ShowSetupSplash__c};
+        var metadataConnectionOK = {!metadataAPIConnectionOkay};
+        var showingAutoValidationPanel = false;
+        var showingOnRequestPanel = false;
+    
+        var showManualSetup = function() {
+            if (showAnimating === false) {
+                showAnimating=true;
+                j$('.setup-panel-country').slideUp();
+                j$('.setup-panel-quick').slideUp(
+                    function() {
+                        j$('.setup-panel-manual').slideDown(function(){showAnimating=false;});
+                        j$('.setup-panel-country').slideDown();
+                        j$('.setup-panel-address-forms').slideDown();
+                    }
+                );
+                showingAutoValidationPanel = false;
+                showingOnRequestPanel = true;
+            }
+            
+        }
+        var showQuickSetup = function() {  
+            if (showAnimating === false) {
+                showAnimating=true;
+                j$('.setup-panel-country').slideUp();
+                j$('.setup-panel-address-forms').slideUp();
+                j$('.setup-panel-manual').slideUp(
+                    function() {
+                        j$('.setup-panel-quick').slideDown(function(){showAnimating=false;});
+                        if (metadataConnectionOK===true) j$('.setup-panel-country').slideDown();
+                    }
+                );
+                showingOnRequestPanel = false;
+                showingAutoValidationPanel = true;
+            }
+        }
+        
+        var showPcaSplash = function() {
+            j$('.pca-splash').detach().appendTo('body');
+            j$('#contentWrapper').css('opacity', 0);
+            j$('.pca-splash').css('opacity', 1);
+        }
+        var hidePcaSplash = function() {
+            j$('.pca-splash').fadeOut(1000);            
+            j$('#contentWrapper').css('opacity', 1);
+        }
+        
+        var update = function(accCloned, conCloned, leaCloned) {
+            accountCloned = accCloned;
+            contactCloned = conCloned;
+            leadCloned = leaCloned;
+            updateStatusImages(accountCloned,contactCloned,leadCloned);
+            pcaEnableControls();
+        }
+        
+        var pcaDisableControls = function() {
+            j$('.pca-control').attr('disabled', true);
+            j$('.pca-control').addClass('btnDisabled'); 
+        }
+        var pcaEnableControls = function() {               
+            
+            j$('.pca-clone-control').attr('disabled', false);
+            j$('.pca-clone-control').removeClass('btnDisabled');
+            
+            j$('.pca-layout-control').attr('disabled', false);            
+            j$('.pca-layout-control').removeClass('btnDisabled');
+            
+            if (accountCloned) {
+                j$('.pca-account-live-control').attr('disabled', false);            
+                j$('.pca-account-live-control').removeClass('btnDisabled');
+                j$('.pca-account-reset-control').attr('disabled', false);            
+                j$('.pca-account-reset-control').removeClass('btnDisabled');
+            }
+            else {                          
+                j$('.pca-account-live-control').attr('disabled', true);
+                j$('.pca-account-live-control').addClass('btnDisabled');           
+                j$('.pca-account-reset-control').attr('disabled', true);
+                j$('.pca-account-reset-control').addClass('btnDisabled');
+            }
+            if (contactCloned) {
+                j$('.pca-contact-live-control').attr('disabled', false);            
+                j$('.pca-contact-live-control').removeClass('btnDisabled');
+                j$('.pca-contact-reset-control').attr('disabled', false);            
+                j$('.pca-contact-reset-control').removeClass('btnDisabled');
+            }
+            else {                          
+                j$('.pca-contact-live-control').attr('disabled', true);
+                j$('.pca-contact-live-control').addClass('btnDisabled');           
+                j$('.pca-contact-reset-control').attr('disabled', true);
+                j$('.pca-contact-reset-control').addClass('btnDisabled');
+            }
+            if (leadCloned) {
+                j$('.pca-lead-live-control').attr('disabled', false);            
+                j$('.pca-lead-live-control').removeClass('btnDisabled');
+                j$('.pca-lead-reset-control').attr('disabled', false);            
+                j$('.pca-lead-reset-control').removeClass('btnDisabled');
+            }
+            else {                          
+                j$('.pca-lead-live-control').attr('disabled', true);
+                j$('.pca-lead-live-control').addClass('btnDisabled');           
+                j$('.pca-lead-reset-control').attr('disabled', true);
+                j$('.pca-lead-reset-control').addClass('btnDisabled');
+            }
+        }
+        
+
+        var getSObjectOverrideAction = function(sObjectName, actionName) {
+            
+            try {       
+                
+                var sObjectsDescribe = sforce.connection.describeSObjects([sObjectName]);
+                if(typeof sObjectsDescribe === 'undefined' || sObjectsDescribe.length !== 1)
+                    return ''; //if we could not get the object
+                
+                var actionOverrides = sObjectsDescribe[0].actionOverrides;
+                
+                if(typeof actionOverrides === 'undefined')
+                    return '';//if we do not have any overrides
+                
+                //multiple overrides
+                if(Object.prototype.toString.call(actionOverrides) === '[object Array]')
+                {
+                    for(var i = 0; i < actionOverrides.length; i++)
+                    {
+                        var actionOverride = actionOverrides[i];
+                        if(actionOverride.name === actionName)
+                            return actionOverride.url;
+                    }
+                }
+                else //one override
+                {
+                    if(actionOverrides.name === actionName)
+                        return actionOverrides.url;
+                }
+            }
+            catch(e){
+            }
+            return '';
+        }
+        
+        var checkStatuses = function() {
+            UpdateStatuses();   
+        }
+        
+        var setLoadingImages = function(account, contact, lead) {
+            
+            if (account) {
+                var aSrc = j$('.accountOverriddenImage').attr('src');            
+                var acSrc = j$('.accountClonedImage').attr('src');
+                acSrc = acSrc.replace('tick.png', 'loading.gif');
+                acSrc = acSrc.replace('cross.png', 'loading.gif');
+                aSrc = aSrc.replace('tick.png', 'loading.gif');
+                aSrc = aSrc.replace('cross.png', 'loading.gif');
+                j$('.accountClonedImage').attr('src', acSrc);      
+                j$('.accountOverriddenImage').attr('src', aSrc);
+            }
+            
+            if (contact) {
+                var cSrc = j$('.contactOverriddenImage').attr('src');
+                var ccSrc = j$('.contactClonedImage').attr('src');
+                ccSrc = ccSrc.replace('tick.png', 'loading.gif');
+                ccSrc = ccSrc.replace('cross.png', 'loading.gif');
+                cSrc = cSrc.replace('tick.png', 'loading.gif');
+                cSrc = cSrc.replace('cross.png', 'loading.gif');
+                j$('.contactClonedImage').attr('src', ccSrc);
+                j$('.contactOverriddenImage').attr('src', cSrc);
+            }
+            
+            if (lead) {
+                var lcSrc = j$('.leadClonedImage').attr('src');
+                var lSrc = j$('.leadOverriddenImage').attr('src');
+                lcSrc = lcSrc.replace('tick.png', 'loading.gif');
+                lcSrc = lcSrc.replace('cross.png', 'loading.gif');
+                lSrc = lSrc.replace('tick.png', 'loading.gif');
+                lSrc = lSrc.replace('cross.png', 'loading.gif');
+                j$('.leadClonedImage').attr('src', lcSrc);      
+                j$('.leadOverriddenImage').attr('src', lSrc);
+            }
+        }
+    
+    
+        var updateStatusImages = function(accCloned, conCloned, leaCloned) {
+            
+            accountCloned = accCloned;
+            contactCloned = conCloned;
+            leadCloned = leaCloned;
+            
+            var accountOverrideUrl = getSObjectOverrideAction('Account', 'Edit');
+            var contactOverrideUrl = getSObjectOverrideAction('Contact', 'Edit');
+            var leadOverrideUrl = getSObjectOverrideAction('Lead', 'Edit'); 
+            
+            var aSrc = j$('.accountOverriddenImage').attr('src');
+            var cSrc = j$('.contactOverriddenImage').attr('src');
+            var lSrc = j$('.leadOverriddenImage').attr('src');
+            
+            var acSrc = j$('.accountClonedImage').attr('src');
+            var ccSrc = j$('.contactClonedImage').attr('src');
+            var lcSrc = j$('.leadClonedImage').attr('src');
+            
+            if (accountCloned) {
+                acSrc = acSrc.replace('loading.gif', 'tick.png');
+                acSrc = acSrc.replace('cross.png', 'tick.png');
+            }
+            else {
+                acSrc = acSrc.replace('loading.gif', 'cross.png');
+                acSrc = acSrc.replace('tick.png', 'cross.png');
+                j$('.pca-account-live-control').attr('disabled', true);
+                j$('.pca-account-live-control').addClass('btnDisabled'); 
+            }        
+            if (contactCloned) {
+                ccSrc = ccSrc.replace('loading.gif', 'tick.png');
+                ccSrc = ccSrc.replace('cross.png', 'tick.png');
+            }
+            else {
+                ccSrc = ccSrc.replace('loading.gif', 'cross.png');
+                ccSrc = ccSrc.replace('tick.png', 'cross.png');
+                j$('.pca-contact-live-control').attr('disabled', true);
+                j$('.pca-contact-live-control').addClass('btnDisabled'); 
+            }  
+            if (leadCloned) {
+                lcSrc = lcSrc.replace('loading.gif', 'tick.png');
+                lcSrc = lcSrc.replace('cross.png', 'tick.png');
+            }
+            else {
+                lcSrc = lcSrc.replace('loading.gif', 'cross.png');
+                lcSrc = lcSrc.replace('tick.png', 'cross.png');
+                j$('.pca-lead-live-control').attr('disabled', true);
+                j$('.pca-lead-live-control').addClass('btnDisabled'); 
+            } 
+            
+            if (accountOverrideUrl.indexOf('_pca_clone') > -1) {
+                aSrc = aSrc.replace('loading.gif', 'tick.png');
+                aSrc = aSrc.replace('cross.png', 'tick.png');
+            }
+            else {
+                aSrc = aSrc.replace('loading.gif', 'cross.png');
+                aSrc = aSrc.replace('tick.png', 'cross.png');
+            }        
+            if (contactOverrideUrl.indexOf('_pca_clone') > -1) {
+                cSrc = cSrc.replace('loading.gif', 'tick.png');
+                cSrc = cSrc.replace('cross.png', 'tick.png');
+            }
+            else {
+                cSrc = cSrc.replace('loading.gif', 'cross.png');
+                cSrc = cSrc.replace('tick.png', 'cross.png');
+            }
+            if (leadOverrideUrl.indexOf('_pca_clone') > -1) {
+                lSrc = lSrc.replace('loading.gif', 'tick.png');
+                lSrc = lSrc.replace('cross.png', 'tick.png');
+            }
+            else {
+                lSrc = lSrc.replace('loading.gif', 'cross.png');
+                lSrc = lSrc.replace('tick.png', 'cross.png');
+            }
+            
+            j$('.accountClonedImage').attr('src', acSrc);
+            j$('.contactClonedImage').attr('src', ccSrc);
+            j$('.leadClonedImage').attr('src', lcSrc);
+            
+            j$('.accountOverriddenImage').attr('src', aSrc);
+            j$('.contactOverriddenImage').attr('src', cSrc);
+            j$('.leadOverriddenImage').attr('src', lSrc);
+        }
+        
+        
+        var addRemoteSiteSettings = function() {
+            // Disable button
+            //document.getElementById('AddRemoteSiteSettings').disabled = true;
+            j$('.add-remote-site-settings-btn').attr('disabled', true);
+            j$('.add-remote-site-settings-btn').addClass('btnDisabled');  
+            // Calls the Metdata API from JavaScript to create the Remote Site Setting to permit Apex callouts
+            var binding = new XMLHttpRequest();
+            var request =
+                '<?xml version="1.0" encoding="utf-8"?>' +
+                '<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'+
+                    '<env:Header>' +
+                        '<urn:SessionHeader xmlns:urn="http://soap.sforce.com/2006/04/metadata">' +
+                            '<urn:sessionId>{!$Api.Session_ID}</urn:sessionId>' +
+                        '</urn:SessionHeader>' +
+                    '</env:Header>' +
+                    '<env:Body>' +
+                        '<createMetadata xmlns="http://soap.sforce.com/2006/04/metadata">' +
+                            '<metadata xsi:type="RemoteSiteSetting">' +
+                                '<fullName>PostcodeAnywhereMetadataAPI</fullName>' +
+                                '<description>Metadata API Remote Site Setting for PCA PRedict</description>' +
+                                '<disableProtocolSecurity>false</disableProtocolSecurity>' +
+                                '<isActive>true</isActive>' +
+                                '<url>https://{!Host}</url>' +
+                            '</metadata>' +
+                        '</createMetadata>' +
+                    '</env:Body>' +
+                '</env:Envelope>';
+            binding.open('POST', 'https://{!Host}/services/Soap/m/31.0');
+            binding.setRequestHeader('SOAPAction','""');
+            binding.setRequestHeader('Content-Type', 'text/xml');
+            binding.onreadystatechange =
+                function() {
+                    if(this.readyState==4) {
+                        var parser = new DOMParser();
+                        var doc  = parser.parseFromString(this.response, 'application/xml');
+                        var errors = doc.getElementsByTagName('errors');
+                        var messageText = '';
+                        for(var errorIdx = 0; errorIdx < errors.length; errorIdx++)
+                            messageText += errors.item(errorIdx).getElementsByTagName('message').item(0).innerHTML + '\n';
+                        
+                        setLoadingImages(true, true, true);
+                        CheckMetadataAPIConnection();
+                        RefreshLayouts();
+                    }
+                }
+            binding.send(request);
+        }
+        
+        var startup = function(apiSetup) {     
+            metadataConnectionOK = apiSetup;
+            setLoadingImages(true, true, true);
+            pcaDisableControls();    
+            if (apiSetup) {
+                j$('.quickSetupContainer').css('display', 'block');
+                j$('.addMetaAPIConnection').css('display', 'none');
+                if (metadataConnectionOK===true && showingAutoValidationPanel===true) j$('.setup-panel-country').slideDown();
+                RefreshLayouts();
+                Init();
+            }
+            else {
+                j$('.quickSetupContainer').css('display', 'none');
+                j$('.addMetaAPIConnection').css('display', 'block');
+                j$('.setup-panel-country').css('display', 'none');
+                j$('.setup-panel-address-forms').css('display', 'none');
+                updateStatusImages(false,false,false);
+            }
+             
+        }
+        
+        j$(function() {   
+          
+            if (showSplash) showPcaSplash();
+            
+            startup({!metadataAPIConnectionOkay});
+            
+            if (showSplash) {
+                window.setTimeout(hidePcaSplash, 1000);
+            }
+            else {
+                hidePcaSplash();   
+            }
+        });
+        
+        var countrylist = {
+            hiddenList: pca.getElement("hiddenCountryList"),
+            displayList: pca.getElement("displayCountryList"),
+            codesList: pca.getElement("countryCodes"),
+            initialise: function() {
+                var selection = this.codesList.value.split(",");
+                
+                this.hiddenList.options.length = 0;
+                this.displayList.options.length = 0;
+                
+                for (var i = 0; i < pca.countries.length; i++)
+                    this.hiddenList.options.add(new Option(pca.countries[i].name, pca.countries[i].iso3));
+                
+                for (var s = 0; s < selection.length; s++) {
+                    for (var c = 0; c < this.hiddenList.options.length; c++) {
+                        if (selection[s] == this.hiddenList.options[c].value)
+                            this.moveAcross(c, this.hiddenList, this.displayList);
+                    }
+                }
+            },
+            addOptions: function() {
+                for (var i = 0; i < this.hiddenList.options.length; i++) {
+                    if (this.hiddenList.options[i].selected) {
+                        this.moveAcross(i, this.hiddenList, this.displayList);
+                        i--;
+                    }
+                }
+                
+                this.update();
+            },
+            removeOptions: function() {
+                for (var i = 0; i < this.displayList.options.length; i++) {
+                    if (this.displayList.options[i].selected) {
+                        this.moveAcross(i, this.displayList, this.hiddenList);
+                        i--;
+                    }
+                }
+                
+                this.update();
+            },
+            moveTop: function() {
+                while (this.moveUp()){};
+            },
+            moveBottom: function() {
+                while (this.moveDown()){};
+            },
+            moveUp: function() {
+                var options = this.displayList.options,
+                    moved = false;
+                
+                for (var i = 0; i < options.length; i++) {
+                    if (!options[i].selected) continue;
+                    if (i == 0) break;
+                    
+                    this.swap(options[i], options[i - 1]);
+                    this.scrollToItem(options[i - 1]);
+                    moved = true;
+                }
+                
+                this.update();
+                return moved;
+            },
+            moveDown: function() {
+                var options = this.displayList.options,
+                    moved = false;
+                
+                for (var i = options.length - 1; i >= 0; i--) {
+                    if (!options[i].selected) continue;
+                    if (i == options.length - 1) break;
+                    
+                    this.swap(options[i], options[i + 1]);
+                    this.scrollToItem(options[i + 1]);
+                    moved = true;
+                }
+                
+                this.update();
+                return moved;
+            },
+            moveAcross: function(index, from, to) {
+                var source = from.options[index],
+                    option = new Option(source.text, source.value);
+                
+                to.options[to.options.length] = option;
+                from.remove(index);
+            },
+            swap: function(x, y) {
+                var t = x.text, v = x.value, s = x.selected;
+                
+                x.text = y.text;
+                x.value = y.value;
+                x.selected = y.selected;
+                
+                y.text = t;
+                y.value = v;
+                y.selected = s;
+            },
+            update: function() {
+                var values = [];
+                
+                for (var i = 0; i < this.displayList.options.length; i++)
+                    values.push(this.displayList.options[i].value);
+                
+                this.codesList.value = values.join(",");
+            },
+            scrollToItem: function(item) {
+                var listHeight = pca.getSize(this.displayList).height;
+                
+                if (item.offsetTop < this.displayList.scrollTop)
+                    this.displayList.scrollTop = item.offsetTop;
+                
+                if (item.offsetTop + item.offsetHeight > this.displayList.scrollTop + listHeight)
+                    this.displayList.scrollTop = item.offsetTop + item.offsetHeight - listHeight;
+            }
+        };
+        
+        var account = {
+            keyfield: pca.getElement("key"),
+            balancefield: pca.getElement("creditBalance"),
+            balancelabel: pca.getElement("balanceLabel"),
+            initialise: function() {
+                this.getBalance();
+                
+                if (this.keyfield && !this.keyfield.value)
+                    this.showRegister();
+            },
+            getBalance: function() {
+                if (!this.keyfield || !this.balancefield) return;
+                
+                function success(response) {
+                    pca.setValue(account.balancefield, "None");
+                    
+                    for (var i = 0; i < response.length; i++) {
+                        if (response[i].Type == "Flex") {
+                            pca.setValue(account.balancefield, response[i].Remaining);
+                            break;
+                        }
+                        else {
+                            pca.setValue(account.balanceLabel, response[i].Name);
+                            pca.setValue(account.balancefield, pca.formatLine(response[i], "{Remaining}/{Purchased}"));
+                        }
+                    }
+                }
+                
+                function fail() {
+                    pca.setValue(this.balancefield, "Unknown");                   
+                }
+                
+                pca.fetch("Management/Balance/List/1.10", { Key: escape(this.keyfield.value) }, success, fail);
+            },
+            showRegister: function() {
+                var modal = new pca.Modal({title: "Register for a free account" });
+                
+                function register(details) {
+                    function success(response) {
+                        pca.setValue(account.keyfield, response[0].InternalKey);
+                        modal.hide();
+                        saveSettings();
+                    }
+                    
+                    function fail(error) {
+                        if (error == "Existing Account") {
+                            modal.clear();
+                            modal.setTitle("Existing account found");
+                            modal.setContent('<p>It looks like you have an existing account with us. Please <a href="http://account.postcodeanywhere.co.uk" target="_blank">login to your account</a> to access your keys.</p>');
+                            modal.addButton("Close", modal.hide);
+                        }
+                        else
+                            alert(error);
+                    }
+                    
+                    if (!details["Email"]) { alert("You must enter an email address."); return; }
+                    if (!details["First Password"]) { alert("You must choose a password."); return; }
+                    if (!details["Second Password"]) { alert("You must confirm your password by typing it again."); return; }
+                    if (details["First Password"] != details["Second Password"]) { alert("The passwords do not match."); return; }
+                    
+                    pca.fetch("CapturePlus/Demos/AddAccountAndTrial/v1.10", { 
+                        key: "KT79-MT84-XR94-DK35", 
+                        Source: "Salesforce",
+                        InternalKeyName: "Salesforce Internal",
+                        ExternalKeyName: "Salesforce Public",
+                        Forename: details["First Name"],
+                        Surname: details["Second Name"],
+                        Email: details["Email"],
+                        Phone: details["Phone"],
+                        CompanyName: details["Company"],
+                        Password: details["First Password"]
+                    }, success, fail);
+                }
+                
+                modal.addField("Company", { value: "{!JSENCODE($User.CompanyName)}" });
+                modal.addHalfFields("Name", { value: "{!JSENCODE($User.FirstName)}", placeholder: "First" }, { value: "{!JSENCODE($User.LastName)}", placeholder: "Last" });
+                modal.addField("Email", { value: "{!JSENCODE($User.Email)}", type: "email", required: true });
+                modal.addField("Phone", { value: "{!JSENCODE($User.Phone)}", type: "tel" });
+                modal.addHalfFields("Password", { type: "password", required: true }, { type: "password", required: true, placeholder: "Repeat password" });
+                modal.addButton("Register", register);
+                modal.addButton("Skip", modal.hide, true);
+                modal.show();
+            }
+        };
+        
+        countrylist.initialise();
+        account.initialise();
+    </script>
+
+    <script type="text/javascript">
+        var __sfdcSessionId = '{!GETSESSIONID()}';
+    </script>
+    <script src="../../soap/ajax/36.0/connection.js"></script>
+    
+</apex:page>

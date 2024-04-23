@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>47.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+       <target>lightning__RecordPage</target>
+   </targets>
+       <targetConfigs>
+      <targetConfig targets="lightning__RecordPage">
+        <property name="loqComponentTitle" type="String" default="Loqate verify address" label="Component Title" placeholder="Enter the display title" description="The title that needs to be displayed for this Address Verification. Example: Verify and update Billing Address"/>
+        <property name="loqAddressType" type="String" default="" label="Address Type" description="The type definition for Address. Example: Billing, Shipping etc"/>
+         <property name="loqLimitResult" type="Integer" default="10" label="Limit Results to" description="The number of results to be displayed as you type ahead. Default is 10"/>
+         <property name="loqLanguage" type="String" required="true" label="Language" description="The preferred language for results. This should be a 2 or 4 character language code e.g. (en, fr, en-gb, en-us etc)."/>
+         <property name="loqCountries" type="String" required="true" label="Countries" description="A comma separated list of ISO 2 or 3 character country codes to limit the search within."/>
+         <property name="loqAPIKey" type="String" required="true" label="Loqate API key" description="Loqate API Key"/>
+         <property name="loqEndPoint" type="String" required="true" label="Loqate API Endpoint URL" description="Ensure this endpoint is registered in CSP Trusted Sites in Setup. Loqate Endpoint"/>
+         <property name="loqRetEndPoint" type="String" required="true" label="Loqate API Retrieve Endpoint URL" description="Retrieve Endpoint.Ensure this endpoint is registered in CSP Trusted Sites in Setup. Loqate Endpoint"/>
+         <property name="loqRecUpdateSetup" type="String"  label="Response to Address mapping" description="Provide the string to fetch the mapping details for the update"/>
+          <property name="loqGeoLocEnabled" type="Boolean" required="true" default="false" label="Enable GeoLocation Serach" description="Set this value to enable Geolocation Search using the Loqate GeoLocation Interactive API"/>
+         <property name="loqGeoLocEndPoint" type="String" required="false" label="Loqate API Geolocation Interactive Endpoint URL" description="Geolocation Endpoint.Ensure this endpoint is registered in CSP Trusted Sites in Setup. Loqate Endpoint"/>
+      </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

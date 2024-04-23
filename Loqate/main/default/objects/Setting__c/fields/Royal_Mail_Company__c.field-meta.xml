@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Royal_Mail_Company__c</fullName>
+    <defaultValue>false</defaultValue>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>If checked the company field specified in the address integration will be updated with the company name from the Royal Mail record.</inlineHelpText>
+    <label>Royal Mail Update Company</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

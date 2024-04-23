@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Hide_Sidebar_Component__c</fullName>
+    <defaultValue>false</defaultValue>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>Selecting this option will hide the Postcode Anywhere sidebar component while allowing the app to still function on edit pages.</inlineHelpText>
+    <label>Hide Sidebar Component</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

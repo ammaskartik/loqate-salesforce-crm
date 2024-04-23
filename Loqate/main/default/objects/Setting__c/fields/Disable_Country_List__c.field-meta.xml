@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Disable_Country_List__c</fullName>
+    <defaultValue>false</defaultValue>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>When ticked the app will not replace the standard country field with a picklist. Choose this option if you wish to use your own picklist.</inlineHelpText>
+    <label>Disable Country List</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexComponent xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>33.0</apiVersion>
+    <description>A component to include in Visual Force pages. Provides an address input form in the standard Salesforce layout with address auto-complete.</description>
+    <label>Address</label>
+</ApexComponent>

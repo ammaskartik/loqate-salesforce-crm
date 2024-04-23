@@ -1,0 +1,54 @@
+<template>
+    <lightning-card title={loqComponentTitle}>
+        <template if:true={loqGeoLocEnabled}>
+            <div class="slds-box">
+                <lightning-input type="toggle" label="Toggle to fetch Geo-Location." name="input3" onchange={loq_enableGeoLocationSearch} ></lightning-input>
+            </div>      
+        </template>
+        <div class="slds-form-element slds-p-left_small slds-p-right_small">
+            <label class="slds-form-element__label" for="combobox-id-11">Search {loqAddressType} Address</label>
+            <div class="slds-form-element__control">
+                <div class="slds-combobox_container">
+                    <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aria-expanded="false"
+                        aria-haspopup="listbox" role="combobox">
+                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                            role="none">
+                            <input type="text" oninput={handleSearchKeyChange}
+                                class="slds-input slds-combobox__input slds-has-focus" id="combobox-id-11"
+                                aria-autocomplete="list" autocomplete="off" aria-controls="listbox-id-9" role="textbox"
+                                placeholder="Search..." value={searchKey} />
+                            <template if:true={loqAddresses}>
+                                <div id="listbox-id-9" class="slds-dropdown_length-5 slds-dropdown_fluid"
+                                    role="listbox">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <template for:each={loqAddresses.Items} for:item="loqAddress">
+                                            <li key={loqAddress.Id} role="presentation"
+                                                class="slds-listbox__item" value={loqAddress.Description}>
+                                                <div id={loqAddress.Id}
+                                                    class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small"
+                                                    role="option" onclick={handleOnSelect} data-loqid={loqAddress.Id} data-loqtype={loqAddress.Type} data-loqaddtext={loqAddress.Text} data-loqadddescr={loqAddress.Description}>
+                                                    <span class="slds-media__body" data-loqid={loqAddress.Id} data-loqtype={loqAddress.Type} data-loqaddtext={loqAddress.Text} data-loqadddescr={loqAddress.Description}>
+                                                        <span class="slds-truncate"
+                                                            title={loqAddress.Text} data-loqid={loqAddress.Id} data-loqtype={loqAddress.Type} data-loqaddtext={loqAddress.Text} data-loqadddescr={loqAddress.Description}>{loqAddress.Text}, {loqAddress.Description}</span>
+                                                    </span>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <template if:true={error}>
+            <p class="slds-p-top_small slds-p-left_small">Loqate Exceptions:{error}</p>
+        </template>
+        <template if:true={enableButton}>
+            <div class="slds-p-top_small slds-p-left_small" role="none">
+            <button class="slds-button slds-button_brand" onclick={updateAddress} value={jInp} >Update {loqAddressType} Address</button>
+            </div>
+        </template>
+    </lightning-card>
+</template>

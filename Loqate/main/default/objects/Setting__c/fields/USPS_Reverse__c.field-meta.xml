@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>USPS_Reverse__c</fullName>
+    <defaultValue>false</defaultValue>
+    <deprecated>false</deprecated>
+    <externalId>false</externalId>
+    <inlineHelpText>Enable reverse lookups so that company and partial addresses can be used to search for address records rather than just zip code. This can be used by filling out a partial address and clicking &apos;Find&apos;.</inlineHelpText>
+    <label>USPS Reverse Lookup</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
